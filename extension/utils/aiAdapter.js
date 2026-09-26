@@ -1,14 +1,8 @@
 // utils/aiAdapter.js
-// AI API adapter with cost protection via max_tokens
-// Model routing: Groq (free), backend proxy (Pro), user-supplied OpenAI key (Power)
+// AI API adapter. No provider keys live in the extension: Free and Pro
+// requests go through the Tabwise backend, Power mode uses the user's own key.
 
-
-
-// Free-tier Groq key. Never commit a real key: set it locally before loading the unpacked extension.
-// (Production hardening: proxy Groq through backend/ like the Pro path so no key ships in the client.)
-const GROQ_API_KEY = "YOUR_GROQ_API_KEY";
-
-// utils/aiAdapter.js
+export const BACKEND_URL = "https://backend.eolarak.workers.dev";
 
 /**
  * Ask AI using selected model
@@ -28,46 +22,9 @@ export async function askAI(prompt, model, apiKey = null, maxTokens = 800) {
  * GROQ (FREE TIER)
  * ================================
  */
-async function askGroq(prompt, maxTokens = 800) {
-  try {
-    const MAX_PROMPT_CHARS = 20000;
-
-    let finalPrompt = prompt;
-    if (prompt.length > MAX_PROMPT_CHARS) {
-      finalPrompt =
-        prompt.substring(0, MAX_PROMPT_CHARS) +
-        "\n\n[Content truncated to fit API limits]";
-    }
-
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [{ role: "user", content: finalPrompt }],
-          max_tokens: maxTokens,
-          temperature: 0.7,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Groq API error: ${response.status} - ${error}`);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-
-  } catch (error) {
-    console.error("Groq error:", error);
-    throw new Error(`Failed to get response from Groq: ${error.message}`);
-  }
+async function askGroq(prompt) {
+  const clientId = await getClientId();
+  return callBackend("/ask-free", { prompt: truncate(prompt), clientId });
 }
 
 /**
@@ -122,59 +79,11 @@ async function askOpenAI(prompt, apiKey, maxTokens = 800) {
     // ================================
     // PRO MODE (Secure backend call)
     // ================================
-
-    const { email } = await chrome.storage.local.get(["email"]);
-
-    if (!email) {
-      throw new Error("No email found. Please upgrade to Pro.");
+    const { sessionToken } = await chrome.storage.local.get(["sessionToken"]);
+    if (!sessionToken) {
+      throw new Error("Please sign in with your Pro email.");
     }
-
-    const response = await fetch(
-      "https://backend.eolarak.workers.dev/ask",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
- 	 prompt: finalPrompt,
- 	 email: email  // ✅ FIXED - use the email variable directly
-	}),
-      }
-    );
-
-    if (response.status === 403) {
-      throw new Error("Unauthorized");
-    }
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    const data = await response.json();
-    
-    // Log the full response for debugging
-    console.log("🔍 Backend response:", data);
-    console.log("🔍 Response keys:", Object.keys(data));
-    
-    // Handle different response formats from backend
-    // Try: data.answer, data.reply, data.message, data.content, or data.choices[0].message.content
-    const reply = data.answer ||  // ← YOUR BACKEND USES THIS!
-                  data.reply || 
-                  data.message || 
-                  data.content || 
-                  data.choices?.[0]?.message?.content ||
-                  data.response;
-    
-    if (!reply) {
-      console.error("❌ Backend returned invalid response format");
-      console.error("❌ Full response:", JSON.stringify(data, null, 2));
-      throw new Error("Backend returned invalid response format. Check console for details.");
-    }
-    
-    console.log("✅ Found response in field:", reply.substring(0, 100) + "...");
-    return reply;
+    return await callBackend("/ask", { prompt: finalPrompt }, sessionToken);
 
   } catch (error) {
     console.error("OpenAI error:", error);
@@ -205,4 +114,40 @@ export function estimateTokens(text) {
 export function isWithinTokenLimit(text, maxTokens = 15000) {
   const estimated = estimateTokens(text);
   return estimated <= maxTokens;
+}
+
+function truncate(prompt, maxChars = 20000) {
+  return prompt.length > maxChars
+    ? prompt.substring(0, maxChars) + "\n\n[Content truncated to fit API limits]"
+    : prompt;
+}
+
+/**
+ * Anonymous per-install id used for the server-side Free limit.
+ */
+async function getClientId() {
+  let { clientId } = await chrome.storage.local.get(["clientId"]);
+  if (!clientId) {
+    clientId = crypto.randomUUID();
+    await chrome.storage.local.set({ clientId });
+  }
+  return clientId;
+}
+
+async function callBackend(path, body, sessionToken = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (sessionToken) headers.Authorization = `Bearer ${sessionToken}`;
+
+  const response = await fetch(`${BACKEND_URL}${path}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (response.status === 401) throw new Error("Session expired. Please sign in again.");
+  if (response.status === 403) throw new Error("Unauthorized");
+  if (response.status === 429) throw new Error(data.error || "Daily limit reached");
+  if (!response.ok || !data.answer) throw new Error(data.error || `Backend error ${response.status}`);
+  return data.answer;
 }

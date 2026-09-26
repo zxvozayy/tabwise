@@ -1,3 +1,6 @@
 # Copy to .dev.vars for `npm run dev` (never commit .dev.vars)
 SUPABASE_SERVICE_KEY=your-supabase-service-role-key
 OPENAI_API_KEY=sk-your-openai-key
+GROQ_API_KEY=gsk-your-groq-key
+LEMONSQUEEZY_WEBHOOK_SECRET=your-lemon-squeezy-signing-secret
+RESEND_API_KEY=re_your-resend-key

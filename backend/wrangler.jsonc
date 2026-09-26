@@ -10,10 +10,9 @@
     "enabled": true
   },
 
-  // Non-secret config. Secrets are set with:
-  //   npx wrangler secret put SUPABASE_SERVICE_KEY
-  //   npx wrangler secret put OPENAI_API_KEY
   "vars": {
-    "SUPABASE_URL": "https://YOUR_PROJECT_REF.supabase.co"
+    "SUPABASE_URL": "https://YOUR_PROJECT.supabase.co",
+    // Must be a sender on a domain verified in Resend.
+    "EMAIL_FROM": "Tabwise <login@YOUR_VERIFIED_DOMAIN>"
   }
 }
