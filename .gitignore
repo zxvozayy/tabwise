@@ -1,0 +1,12 @@
+node_modules/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+*.zip
+*.crx
+*.pem
+.DS_Store
+Thumbs.db
+.vscode/

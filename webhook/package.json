@@ -1,0 +1,23 @@
+{
+  "name": "tabwise-webhook",
+  "version": "1.0.0",
+  "description": "Webhook handler for Tabwise Pro subscriptions via Lemon Squeezy",
+  "main": "webhook-worker.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "tail": "wrangler tail",
+    "test": "wrangler dev --test-scheduled"
+  },
+  "keywords": [
+    "cloudflare-workers",
+    "webhook",
+    "lemon-squeezy",
+    "payments"
+  ],
+  "author": "Hasan Özay Yılmaz",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

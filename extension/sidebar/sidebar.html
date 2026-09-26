@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="sidebar.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Header with animated gradient -->
+    <header class="header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="18" cy="6" r="2" fill="currentColor"/>
+            <circle cx="18" cy="18" r="2" fill="currentColor"/>
+          </svg>
+        </div>
+        <h1 class="logo-text">Tabwise</h1>
+        <span class="plan-badge" id="planBadge">Free</span>
+      </div>
+      <div class="header-stats">
+        <button id="headerUpgradeBtn" class="header-upgrade-btn" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+          </svg>
+          <span>Upgrade to Pro</span>
+        </button>
+        <div class="daily-usage" id="dailyUsage">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span id="usageCount">0/10</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Advanced Settings Panel -->
+    <div class="settings-panel">
+      <button id="advancedToggle" class="settings-toggle">
+        <svg class="toggle-icon" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 1v6m0 6v6M1 12h6m6 0h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Advanced options</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      
+      <div id="advancedSection" class="advanced-content">
+        <div class="input-group">
+          <label for="apikey" class="input-label">
+            <svg class="label-icon" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            OpenAI API Key (Unlock Power Mode)
+          </label>
+          <div class="api-key-wrapper">
+            <input
+              id="apikey"
+              type="password"
+              class="api-input"
+              placeholder="sk-..."
+            />
+            <div class="api-key-status" id="apiKeyStatus">
+              <svg class="status-icon" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="input-hint">
+            <strong>Power Mode:</strong> 15 tabs max • Unlimited daily usage • All features
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Question Area -->
+    <div class="question-section">
+      <div class="input-group">
+        <div class="label-with-action">
+          <label for="question" class="input-label">
+            <svg class="label-icon" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 16v.01M12 12a2 2 0 002-2c0-1.1-.9-2-2-2s-2 .9-2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Your Question
+          </label>
+          <button id="selectTabsBtn" class="select-tabs-trigger">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+              <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+              <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+              <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span id="tabModeText">All tabs</span>
+            <span class="tab-count" id="selectedTabCount"></span>
+          </button>
+        </div>
+        <textarea
+          id="question"
+          class="question-input"
+          placeholder="What are the main topics across my tabs?&#10;Summarize the key points...&#10;Compare these articles..."
+        ></textarea>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button id="ask" class="btn btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="btn-text">Ask AI</span>
+          <div class="btn-shine"></div>
+        </button>
+        <button id="compare" class="btn btn-secondary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="btn-text">Compare Tabs</span>
+          <span class="pro-badge">Pro</span>
+          <div class="btn-shine"></div>
+        </button>
+      </div>
+
+      <!-- Tab Groups Section (Pro) -->
+      <div id="tabGroupsSection" class="tab-groups-section">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+              <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+              <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+              <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Tab Groups</span>
+            <span class="pro-badge">Pro</span>
+          </div>
+          <div class="section-actions">
+            <button id="clearAllGroups" class="icon-btn" style="display: none;" title="Clear all selections">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button id="createGroup" class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div id="activeGroupsSummary" class="active-groups-summary" style="display: none;">
+          <div class="summary-content">
+            <span id="activeGroupsText"></span>
+          </div>
+        </div>
+        
+        <div id="groupsList" class="groups-list">
+          <div class="groups-empty">
+            <p>No groups yet. Create one to organize your research!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Selection Modal -->
+    <div id="tabSelectionModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Select Tabs to Analyze</h2>
+          <button id="closeModal" class="modal-close">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="limit-notice" id="tabLimitNotice">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>Free plan: Select up to 3 tabs</span>
+          </div>
+          
+          <div class="tab-selector-actions">
+            <button id="selectAllTabs" class="selector-btn">
+              <svg viewBox="0 0 24 24" fill="none">
+                <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Select All
+            </button>
+            <button id="deselectAllTabs" class="selector-btn">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Deselect All
+            </button>
+          </div>
+          
+          <div id="tabList" class="tab-list">
+            <!-- Tabs will be dynamically inserted here -->
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button id="cancelTabSelection" class="btn btn-secondary">Cancel</button>
+          <button id="confirmTabSelection" class="btn btn-primary">
+            <span class="btn-text">Apply Selection</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal">
+      <div class="modal-content create-group-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Create Tab Group</h2>
+          <button id="closeCreateGroup" class="modal-close">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="input-group">
+            <label for="groupName" class="input-label">
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Group Name
+            </label>
+            <input
+              id="groupName"
+              type="text"
+              placeholder="e.g., Competitors, Research, Product Ideas"
+              maxlength="30"
+            />
+          </div>
+          
+          <p class="group-instruction">Selected tabs will be saved to this group</p>
+          
+          <div id="groupTabsPreview" class="group-tabs-preview">
+            <!-- Preview of selected tabs -->
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button id="cancelCreateGroup" class="btn btn-secondary">Cancel</button>
+          <button id="saveGroup" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2"/>
+              <polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/>
+              <polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span class="btn-text">Save Group</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upgrade to Pro Modal -->
+    <div id="upgradeModal" class="modal upgrade-modal">
+      <div class="modal-content upgrade-content">
+        <button id="closeUpgradeModal" class="modal-close">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <div class="upgrade-header">
+          <div class="upgrade-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h2 class="upgrade-title">Upgrade to Pro</h2>
+          <p class="upgrade-subtitle" id="upgradeReason">Pro features launching soon! Payment processing coming in the next update.</p>
+        </div>
+
+        <div class="upgrade-body">
+          <div class="feature-comparison">
+            <div class="comparison-column">
+              <div class="column-header free">
+                <span class="column-badge">Free</span>
+                <span class="column-title">Current Plan</span>
+              </div>
+              <ul class="feature-list">
+                <li class="feature-item">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>3 tabs max</span>
+                </li>
+                <li class="feature-item">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>10 uses per day</span>
+                </li>
+                <li class="feature-item">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Ask mode only</span>
+                </li>
+                <li class="feature-item disabled">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  <span>Compare mode</span>
+                </li>
+                <li class="feature-item disabled">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  <span>More tabs</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="comparison-column pro">
+              <div class="column-header">
+                <span class="column-badge">Pro</span>
+                <span class="column-title">Recommended</span>
+              </div>
+              <ul class="feature-list">
+                <li class="feature-item">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>8 tabs max</span>
+                </li>
+                <li class="feature-item">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>50 uses per day</span>
+                </li>
+                <li class="feature-item highlight">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span><strong>Tab Groups</strong> - Organize & compare</span>
+                </li>
+                <li class="feature-item">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Compare mode</span>
+                </li>
+                <li class="feature-item">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>OpenAI GPT-4o models</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="power-mode-notice">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" fill="currentColor"/>
+            </svg>
+            <div>
+              <strong>Power Mode:</strong> Use your own OpenAI API key for 15 tabs max & unlimited daily usage
+            </div>
+          </div>
+          
+          <!-- Connected Email Display -->
+          <div id="connectedEmailSection" class="connected-email-section" style="display: none;">
+            <div class="connected-email-header">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/>
+                <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span class="connected-label">Connected Email</span>
+            </div>
+            <div class="connected-email-display" id="connectedEmailDisplay"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="671214021527021f060a170b024904080a">[email&#160;protected]</a></div>
+            <div class="email-actions">
+              <button id="changeEmailBtn" class="email-action-btn">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Change Email</span>
+              </button>
+              <button id="clearEmailBtn" class="email-action-btn danger">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Clear Email</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="pricing-info">
+            <div class="price-tag">
+              <span class="price-amount">$8.99</span>
+              <span class="price-period">/month</span>
+            </div>
+            <p class="price-note">Cancel anytime • 30-day money-back guarantee</p>
+          </div>
+          
+          <!-- Email Input Section -->
+          <div id="emailInputSection" class="email-input-section" style="display: none;">
+            <div class="email-input-label">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/>
+                <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span>Enter your email for Pro subscription:</span>
+            </div>
+            <input 
+              type="email" 
+              id="upgradeEmailInput" 
+              class="upgrade-email-input" 
+              placeholder="your@email.com"
+              autocomplete="email"
+            />
+            <div class="email-hint">Your email will be used for subscription management and receipts.</div>
+          </div>
+          
+          <!-- Stored Email Display -->
+          <div id="storedEmailDisplay" class="stored-email-display" style="display: none;">
+            <!-- Deprecated - using connectedEmailSection instead -->
+          </div>
+        </div>
+
+        <div class="upgrade-footer">
+          <button id="upgradeLater" class="btn btn-secondary">
+            <span class="btn-text">Maybe Later</span>
+          </button>
+          <button id="upgradeNow" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+            </svg>
+            <span class="btn-text">Upgrade to Pro</span>
+            <div class="btn-shine"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state">
+      <div class="empty-illustration">
+        <svg viewBox="0 0 200 160" fill="none">
+          <rect x="20" y="30" width="60" height="80" rx="8" fill="url(#grad1)" opacity="0.3"/>
+          <rect x="70" y="20" width="60" height="80" rx="8" fill="url(#grad2)" opacity="0.5"/>
+          <rect x="120" y="35" width="60" height="80" rx="8" fill="url(#grad3)" opacity="0.4"/>
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h3 class="empty-title">Ready to analyze</h3>
+      <p class="empty-text">
+        Open multiple tabs and ask questions to get AI-powered insights across your browsing session
+      </p>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div id="chatContainer" class="chat-container">
+      <div class="chat-header">
+        <div class="chat-title">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Conversation</span>
+        </div>
+        <button id="clearChat" class="clear-chat-btn">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Clear
+        </button>
+      </div>
+      <div id="chatMessages" class="chat-messages">
+        <!-- Messages will be appended here -->
+      </div>
+    </div>
+
+    <!-- Output Area (hidden, kept for compatibility) -->
+    <div id="output" class="output-container" style="display: none;"></div>
+  </div>
+
+  <script type="module" src="sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  "name": "backend",
+  "main": "src/index.js",
+  "compatibility_date": "2026-02-17",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "observability": {
+    "enabled": true
+  },
+
+  // Non-secret config. Secrets are set with:
+  //   npx wrangler secret put SUPABASE_SERVICE_KEY
+  //   npx wrangler secret put OPENAI_API_KEY
+  "vars": {
+    "SUPABASE_URL": "https://YOUR_PROJECT_REF.supabase.co"
+  }
+}

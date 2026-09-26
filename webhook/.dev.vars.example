@@ -1,0 +1,2 @@
+# Copy to .dev.vars for `npm run dev` (never commit .dev.vars)
+WEBHOOK_SECRET=your-lemon-squeezy-signing-secret

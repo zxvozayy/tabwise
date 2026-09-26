@@ -1,0 +1,16 @@
+name = "tabwise-webhook"
+main = "webhook-worker.js"
+compatibility_date = "2024-01-01"
+
+# KV Namespace for storing user subscription data
+[[kv_namespaces]]
+binding = "USERS"
+id = "YOUR_KV_NAMESPACE_ID" # Get this after running: wrangler kv:namespace create "USERS"
+
+# Environment variables (set these in Cloudflare dashboard or via wrangler secret)
+[vars]
+# WEBHOOK_SECRET = "your_secret_here" # Don't commit this! Use: wrangler secret put WEBHOOK_SECRET
+
+# For development/testing
+[env.dev]
+vars = { }
