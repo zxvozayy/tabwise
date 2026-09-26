@@ -1,0 +1,32 @@
+name: tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      # Runs against a mocked Supabase/Groq/OpenAI/Resend fetch layer: no
+      # secrets or live services needed.
+      - name: Run backend tests
+        run: npm test
+      - name: Syntax-check the extension (no build step)
+        working-directory: .
+        run: |
+          node --check extension/sidebar/sidebar.js
+          node --check extension/utils/aiAdapter.js
+          node --check extension/background.js
+          node --check extension/content.js
